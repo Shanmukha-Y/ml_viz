@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler
 n_samples = 1000
 X, _ = make_moons(n_samples=n_samples, noise=0.1, random_state=42)
 
+
 # Standardize the data
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
