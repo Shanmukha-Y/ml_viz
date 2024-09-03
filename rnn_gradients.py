@@ -6,9 +6,20 @@ import matplotlib.pyplot as plt
 torch.manual_seed(0)
 np.random.seed(0)
 
-def generate_complex_data(seq_length, num_sequences):
+# def generate_complex_data(seq_length, num_sequences):
+#     X = np.random.randn(num_sequences, seq_length, 1).astype(np.float32)
+#     y = ((X[:, 0, 0] > 0) & (X[:, 10, 0] > 0) & (X[:, 23, 0] > 0)).astype(np.float32)
+#     return torch.from_numpy(X), torch.from_numpy(y)
+
+def generate_complex_data(seq_length, num_sequences, num_relevant_positions=15):
     X = np.random.randn(num_sequences, seq_length, 1).astype(np.float32)
-    y = ((X[:, 0, 0] > 0) & (X[:, 10, 0] > 0) & (X[:, 23, 0] > 0)).astype(np.float32)
+    
+    # Generate random positions for each sequence
+    relevant_positions = np.random.randint(0, seq_length, size=(num_sequences, num_relevant_positions))
+    
+    # Create the target based on the values at the random positions
+    y = np.all(np.take_along_axis(X[:, :, 0], relevant_positions, axis=1) > 0, axis=1).astype(np.float32)
+    
     return torch.from_numpy(X), torch.from_numpy(y)
 
 class DeepRNN(nn.Module):
@@ -67,14 +78,14 @@ def visualize_results(gradient_norms, losses):
     plt.tight_layout()
     plt.show()
 
-seq_length = 500
+seq_length = 1000
 num_sequences = 1000
 input_size = 1
-hidden_size = 20
-num_layers = 3
+hidden_size = 3
+num_layers = 2
 output_size = 1
 num_epochs = 1000
-learning_rate = 0.001
+learning_rate = 0.01
 
 X, y = generate_complex_data(seq_length, num_sequences)
 model = DeepRNN(input_size, hidden_size, num_layers, output_size)
